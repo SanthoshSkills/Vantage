@@ -4,8 +4,11 @@
 
 @layer base {
   body {
-    @apply bg-[#010101] text-white overflow-x-hidden selection:bg-emeraldGlow/30;
+    @apply bg-obsidian text-slate-200 overflow-x-hidden selection:bg-emeraldGlow/40;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    background-image: radial-gradient(circle at top right, rgba(16, 185, 129, 0.05), transparent 40%),
+                      radial-gradient(circle at bottom left, rgba(244, 63, 94, 0.05), transparent 40%);
+    background-attachment: fixed;
   }
 }
 

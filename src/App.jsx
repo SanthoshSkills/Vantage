@@ -50,11 +50,11 @@ function App() {
 
   return (
     <div 
-      className={`min-h-screen bg-obsidian text-white flex flex-col transition-all duration-500 ${!isVisible ? 'blur-grayscale' : ''}`}
+      className={`min-h-screen bg-obsidian text-slate-200 flex flex-col transition-all duration-500 ${!isVisible ? 'blur-grayscale' : ''}`}
       data-testid="vantage-root"
     >
       <GlobalRibbon indices={marketIndices} onSelect={handleSelect} />
-      <VelocityTicker news={news} />
+      <VelocityTicker news={news} onSelect={handleSelect} />
       
       <main className="flex-grow">
         {news.length > 0 ? (

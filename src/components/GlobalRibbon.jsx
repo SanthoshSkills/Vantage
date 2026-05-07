@@ -13,12 +13,19 @@ const GlobalRibbon = ({ indices, onSelect }) => {
         {[...indices, ...indices].map((index, i) => (
           <div 
             key={`${index.name}-${i}`} 
-            className="flex items-center space-x-3 cursor-pointer hover:bg-white/5 px-2 py-1 rounded transition-colors"
-            onClick={() => onSelect(index)}
+            className="flex items-center space-x-3 cursor-pointer hover:bg-slate-800 px-2 py-1 rounded transition-colors"
+            onClick={() => onSelect({
+              title: `${index.name} Index Status: ${index.marketState}`,
+              score: index.trend === 'up' ? 50 : -50,
+              velocity: Math.abs(parseFloat(index.delta) || 0) * 10,
+              url: `https://finance.yahoo.com/quote/${index.name}`,
+              type: 'market',
+              delta: index.delta
+            })}
           >
-            <span className="text-[10px] font-bold tracking-widest text-white/40 uppercase">{index.name}</span>
-            <span className="text-xs font-mono font-medium">{index.value}</span>
-            <span className={`text-[10px] flex items-center ${index.trend === 'up' ? 'text-emerald-500' : 'text-rose-500'}`}>
+            <span className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">{index.name}</span>
+            <span className="text-xs font-mono font-medium text-slate-200">{index.value}</span>
+            <span className={`text-[10px] flex items-center ${index.trend === 'up' ? 'text-emeraldBright' : 'text-roseBright'}`}>
               {index.trend === 'up' ? <TrendingUp size={12} className="mr-1" /> : <TrendingDown size={12} className="mr-1" />}
               {index.delta}
             </span>

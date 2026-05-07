@@ -35,27 +35,27 @@ const Dashboard = ({ news, onSelect, city }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.08, duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
             onClick={() => onSelect(item)}
-            className="group relative glass p-5 rounded-none cursor-pointer border-l-2 border-l-transparent hover:border-l-emeraldGlow transition-all duration-300"
+            className="group relative bg-obsidianLight border border-slate-800 p-5 rounded-md shadow-lg cursor-pointer hover:border-emeraldBright transition-all duration-300"
           >
-            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-emeraldGlow/0 via-emeraldGlow/20 to-emeraldGlow/0 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-emeraldBright/0 via-emeraldBright/20 to-emeraldBright/0 opacity-0 group-hover:opacity-100 transition-opacity" />
             
             <div className="flex justify-between items-start mb-5">
-              <span className="text-[36px] font-extralight text-white/[0.04] group-hover:text-white/[0.08] transition-colors leading-none">
+              <span className="text-[36px] font-extralight text-slate-700 group-hover:text-slate-500 transition-colors leading-none">
                 0{i + 1}
               </span>
-              <Zap size={14} className="text-white/10 group-hover:text-emeraldGlow transition-colors" />
+              <Zap size={14} className="text-slate-600 group-hover:text-emeraldBright transition-colors" />
             </div>
             
-            <h3 className={`text-[15px] font-medium leading-snug mb-4 transition-colors line-clamp-3 ${item.class || 'text-white/90'} group-hover:brightness-125`}>
+            <h3 className={`text-[15px] font-medium leading-snug mb-4 transition-colors line-clamp-3 ${item.class || 'text-slate-200'} group-hover:brightness-125`}>
               {item.title}
             </h3>
 
-            <div className="mt-auto pt-4 border-t border-white/[0.06] flex items-center justify-between">
+            <div className="mt-auto pt-4 border-t border-slate-800 flex items-center justify-between">
               <div className="flex flex-col">
-                <span className="text-[8px] text-white/25 uppercase font-bold tracking-[0.2em]">Velocity</span>
-                <span className="text-sm font-mono text-white/70">{item.velocity}</span>
+                <span className="text-[8px] text-slate-400 uppercase font-bold tracking-[0.2em]">Velocity</span>
+                <span className="text-sm font-mono text-slate-300">{item.velocity}</span>
               </div>
-              <ArrowUpRight size={12} className="text-white/10 group-hover:text-emeraldGlow group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+              <ArrowUpRight size={12} className="text-slate-600 group-hover:text-emeraldBright group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
             </div>
           </motion.div>
         ))}

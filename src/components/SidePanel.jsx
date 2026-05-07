@@ -62,23 +62,23 @@ const SidePanel = ({ item, isOpen, onClose }) => {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 250 }}
-            className="fixed top-0 right-0 h-full w-full max-w-md bg-[#030303] border-l border-white/[0.08] z-50 flex flex-col shadow-2xl"
+            className="fixed top-0 right-0 h-full w-full max-w-md bg-obsidianLight border-l border-slate-800 z-50 flex flex-col shadow-2xl"
           >
             <div className="p-8 pb-0">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-3">
-                  <div className={`w-2 h-2 rounded-full ${isPositive ? 'bg-emeraldGlow' : 'bg-roseGlow'} animate-pulse`} />
-                  <span className="text-[10px] font-bold tracking-[0.3em] text-white/30 uppercase">Intelligence Brief</span>
+                  <div className={`w-2 h-2 rounded-full ${isPositive ? 'bg-emeraldBright' : 'bg-roseBright'} animate-pulse`} />
+                  <span className="text-[10px] font-bold tracking-[0.3em] text-slate-400 uppercase">Intelligence Brief</span>
                 </div>
-                <button onClick={onClose} className="p-2 hover:bg-white/5 rounded transition-colors">
-                  <X size={16} className="text-white/30" />
+                <button onClick={onClose} className="p-2 hover:bg-slate-800 rounded transition-colors">
+                  <X size={16} className="text-slate-400" />
                 </button>
               </div>
-              <div className="h-px bg-gradient-to-r from-white/10 to-transparent mb-8" />
+              <div className="h-px bg-gradient-to-r from-slate-700 to-transparent mb-8" />
             </div>
 
             <div className="px-8 mb-6">
-              <h2 className={`text-xl font-light leading-tight ${item.class}`}>
+              <h2 className={`text-xl font-medium leading-tight ${item.class || 'text-slate-200'}`}>
                 {item.title}
               </h2>
             </div>
@@ -94,25 +94,25 @@ const SidePanel = ({ item, isOpen, onClose }) => {
                 >
                   <div className="flex items-center space-x-3 mb-2">
                     <point.icon size={13} className={`${point.accent} transition-colors`} />
-                    <span className="text-[9px] font-bold tracking-[0.25em] text-white/30 uppercase">{point.label}</span>
+                    <span className="text-[9px] font-bold tracking-[0.25em] text-slate-400 uppercase">{point.label}</span>
                   </div>
-                  <p className="text-white/70 text-sm font-light leading-relaxed pl-[25px]">
+                  <p className="text-slate-300 text-sm font-normal leading-relaxed pl-[25px]">
                     {point.value}
                   </p>
                 </motion.div>
               ))}
             </div>
 
-            <div className="p-8 pt-6 border-t border-white/[0.06] space-y-3">
+            <div className="p-8 pt-6 border-t border-slate-800 space-y-3 bg-obsidian">
               <a 
                 href={item.url} 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="w-full block text-center bg-white text-[#010101] py-3.5 text-[10px] font-bold tracking-[0.25em] uppercase hover:bg-emeraldGlow transition-colors"
+                className="w-full block text-center bg-slate-200 text-obsidian py-3.5 text-[10px] font-bold tracking-[0.25em] uppercase hover:bg-emeraldBright transition-colors"
               >
                 Access Source Intel
               </a>
-              <button onClick={onClose} className="w-full bg-transparent text-white/30 py-2 text-[10px] font-bold tracking-[0.2em] uppercase hover:text-white/60 transition-colors">
+              <button onClick={onClose} className="w-full bg-transparent text-slate-400 py-2 text-[10px] font-bold tracking-[0.2em] uppercase hover:text-slate-200 transition-colors">
                 Dismiss Brief
               </button>
             </div>
