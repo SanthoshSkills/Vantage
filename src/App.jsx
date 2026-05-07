@@ -8,7 +8,7 @@ import SidePanel from './components/SidePanel';
 import HandoverBrief from './components/HandoverBrief';
 
 function App() {
-  const { city, news, marketIndices, loading, lastVisit } = useVantageData();
+  const { city, news, marketIndices, loading, lastVisit, newsSource, marketSource } = useVantageData();
   const isVisible = useVisibility();
   
   const [selectedItem, setSelectedItem] = useState(null);
@@ -33,6 +33,12 @@ function App() {
     setIsPanelOpen(true);
   };
 
+  const sourceColor = (src) => {
+    if (src === 'LIVE') return 'text-emeraldGlow';
+    if (src === 'CACHED' || src === 'STALE') return 'text-amber-400';
+    return 'text-roseGlow';
+  };
+
   if (loading) {
     return (
       <div className="h-screen w-screen bg-[#010101] flex flex-col items-center justify-center">
@@ -51,7 +57,16 @@ function App() {
       <VelocityTicker news={news} />
       
       <main className="flex-grow">
-        <Dashboard news={news} onSelect={handleSelect} city={city} />
+        {news.length > 0 ? (
+          <Dashboard news={news} onSelect={handleSelect} city={city} />
+        ) : (
+          <div className="flex flex-col items-center justify-center h-96">
+            <span className="text-[10px] font-bold tracking-[0.3em] text-white/20 uppercase mb-4">No Signals Detected</span>
+            <p className="text-white/30 text-sm max-w-md text-center">
+              Add a <code className="text-emeraldGlow bg-white/5 px-1.5 py-0.5 text-xs">VITE_GNEWS_API_KEY</code> or <code className="text-emeraldGlow bg-white/5 px-1.5 py-0.5 text-xs">VITE_NEWSDATA_API_KEY</code> to your <code className="text-white/50">.env</code> file to activate the live news feed.
+            </p>
+          </div>
+        )}
       </main>
 
       <footer className="px-6 py-3 border-t border-white/[0.04] flex justify-between items-center bg-[#020202]">
@@ -65,8 +80,12 @@ function App() {
             <span className="text-[11px] font-mono text-white/50">{systemTime.toLocaleTimeString()}</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-[8px] font-bold text-white/20 uppercase tracking-[0.2em]">Signals</span>
-            <span className="text-[11px] font-mono text-white/50">{news.length}</span>
+            <span className="text-[8px] font-bold text-white/20 uppercase tracking-[0.2em]">Markets</span>
+            <span className={`text-[11px] font-mono font-bold ${sourceColor(marketSource)}`}>{marketSource}</span>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-[8px] font-bold text-white/20 uppercase tracking-[0.2em]">Intel</span>
+            <span className={`text-[11px] font-mono font-bold ${sourceColor(newsSource)}`}>{newsSource}</span>
           </div>
         </div>
         <div className="text-[8px] font-bold text-white/10 uppercase tracking-[0.2em]">
