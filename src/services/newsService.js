@@ -5,59 +5,47 @@ const NEWS_CACHE_KEY = 'vantage_news_cache';
 const NEWS_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
 /**
- * Fetch news from GNews API (free tier: 100 req/day).
- * Requires VITE_GNEWS_API_KEY in .env
+ * Fetch and parse an RSS feed using a free CORS proxy.
+ * Zero API keys required.
  */
-const fetchGNews = async (city, country) => {
-  const key = import.meta.env.VITE_GNEWS_API_KEY;
-  if (!key) return null;
-
-  const [globalRes, localRes] = await Promise.allSettled([
-    fetch(`https://gnews.io/api/v4/top-headlines?lang=en&max=10&token=${key}`, { signal: AbortSignal.timeout(8000) }),
-    fetch(`https://gnews.io/api/v4/search?q=${encodeURIComponent(city)}&lang=en&max=5&token=${key}`, { signal: AbortSignal.timeout(8000) }),
-  ]);
-
-  const articles = [];
-
-  if (globalRes.status === 'fulfilled' && globalRes.value.ok) {
-    const data = await globalRes.value.json();
-    if (data.articles) articles.push(...data.articles.map(a => ({ ...a, scope: 'GLOBAL' })));
-  }
-
-  if (localRes.status === 'fulfilled' && localRes.value.ok) {
-    const data = await localRes.value.json();
-    if (data.articles) articles.push(...data.articles.map(a => ({ ...a, scope: 'LOCAL' })));
-  }
-
-  if (articles.length === 0) return null;
-  return articles;
-};
-
-/**
- * Fetch news from NewsData.io (free tier: 200 credits/day).
- * Requires VITE_NEWSDATA_API_KEY in .env
- */
-const fetchNewsData = async (country) => {
-  const key = import.meta.env.VITE_NEWSDATA_API_KEY;
-  if (!key) return null;
-
+const fetchRSS = async (rssUrl, scope) => {
+  const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`;
   try {
-    const res = await fetch(
-      `https://newsdata.io/api/1/latest?apikey=${key}&language=en&size=10`,
-      { signal: AbortSignal.timeout(8000) }
-    );
-    if (!res.ok) return null;
+    const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(10000) });
+    if (!res.ok) return [];
+    
     const data = await res.json();
-    if (!data.results) return null;
-    return data.results.map(a => ({
-      title: a.title,
-      publishedAt: a.pubDate,
-      source: a.source_name,
-      url: a.link,
-      scope: (a.country && a.country.includes(country)) ? 'LOCAL' : 'GLOBAL',
-    }));
-  } catch {
-    return null;
+    if (!data.contents) return [];
+
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(data.contents, "text/xml");
+    const items = xmlDoc.querySelectorAll("item");
+    
+    const articles = [];
+    items.forEach((item, index) => {
+      // Only take top 5 from each feed to maintain velocity
+      if (index >= 5) return;
+      
+      const title = item.querySelector("title")?.textContent || '';
+      const pubDate = item.querySelector("pubDate")?.textContent || new Date().toISOString();
+      const link = item.querySelector("link")?.textContent || '#';
+      const source = item.querySelector("source")?.textContent || 'RSS Feed';
+      
+      if (title) {
+        articles.push({
+          title,
+          publishedAt: pubDate,
+          source,
+          url: link,
+          scope,
+        });
+      }
+    });
+    
+    return articles;
+  } catch (e) {
+    console.error(`Vantage RSS Error (${scope}):`, e);
+    return [];
   }
 };
 
@@ -70,11 +58,7 @@ const processArticles = (articles) => {
     .map(item => {
       const sentiment = analyzeSentiment(item.title);
       return {
-        title: item.title,
-        publishedAt: item.publishedAt || item.pubDate || new Date().toISOString(),
-        source: item.source?.name || item.source || 'Wire',
-        url: item.url || '#',
-        scope: item.scope || 'GLOBAL',
+        ...item,
         ...sentiment,
       };
     });
@@ -83,7 +67,7 @@ const processArticles = (articles) => {
 };
 
 /**
- * Main entry: fetch news from available APIs with cache fallback.
+ * Main entry: fetch news from open RSS feeds with cache fallback.
  */
 export const fetchNews = async (city, country) => {
   // Check cache
@@ -95,17 +79,21 @@ export const fetchNews = async (city, country) => {
     }
   }
 
-  // Try GNews first
-  let articles = await fetchGNews(city, country);
+  // Define RSS endpoints (Google News)
+  const globalRssUrl = `https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en`;
+  const localRssUrl = `https://news.google.com/rss/headlines/section/geo/${encodeURIComponent(city)}?hl=en&gl=${country || 'US'}&ceid=${country || 'US'}:en`;
 
-  // Fallback to NewsData.io
-  if (!articles) {
-    articles = await fetchNewsData(country);
-  }
+  // Fetch concurrently
+  const [globalArticles, localArticles] = await Promise.all([
+    fetchRSS(globalRssUrl, 'GLOBAL'),
+    fetchRSS(localRssUrl, 'LOCAL')
+  ]);
+
+  const combinedArticles = [...localArticles, ...globalArticles];
 
   // If we got real articles, process and cache them
-  if (articles && articles.length > 0) {
-    const ranked = processArticles(articles);
+  if (combinedArticles.length > 0) {
+    const ranked = processArticles(combinedArticles);
     localStorage.setItem(NEWS_CACHE_KEY, JSON.stringify({ data: ranked, timestamp: Date.now() }));
     return { news: ranked, source: 'LIVE' };
   }

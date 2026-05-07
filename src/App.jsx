@@ -63,7 +63,7 @@ function App() {
           <div className="flex flex-col items-center justify-center h-96">
             <span className="text-[10px] font-bold tracking-[0.3em] text-white/20 uppercase mb-4">No Signals Detected</span>
             <p className="text-white/30 text-sm max-w-md text-center">
-              Add a <code className="text-emeraldGlow bg-white/5 px-1.5 py-0.5 text-xs">VITE_GNEWS_API_KEY</code> or <code className="text-emeraldGlow bg-white/5 px-1.5 py-0.5 text-xs">VITE_NEWSDATA_API_KEY</code> to your <code className="text-white/50">.env</code> file to activate the live news feed.
+              Intelligence feed is currently offline or blocked by corporate firewall.
             </p>
           </div>
         )}
