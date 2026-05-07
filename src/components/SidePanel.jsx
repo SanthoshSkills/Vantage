@@ -104,9 +104,14 @@ const SidePanel = ({ item, isOpen, onClose }) => {
             </div>
 
             <div className="p-8 pt-6 border-t border-white/[0.06] space-y-3">
-              <button className="w-full bg-white text-[#010101] py-3.5 text-[10px] font-bold tracking-[0.25em] uppercase hover:bg-emeraldGlow transition-colors">
-                Initiate Executive Action
-              </button>
+              <a 
+                href={item.url} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="w-full block text-center bg-white text-[#010101] py-3.5 text-[10px] font-bold tracking-[0.25em] uppercase hover:bg-emeraldGlow transition-colors"
+              >
+                Access Source Intel
+              </a>
               <button onClick={onClose} className="w-full bg-transparent text-white/30 py-2 text-[10px] font-bold tracking-[0.2em] uppercase hover:text-white/60 transition-colors">
                 Dismiss Brief
               </button>
