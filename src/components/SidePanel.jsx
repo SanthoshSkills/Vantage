@@ -1,16 +1,49 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Info, Target, BarChart3, Radio, HelpCircle } from 'lucide-react';
+import { X, Crosshair, Target, Radio, BarChart3, AlertTriangle } from 'lucide-react';
 
 const SidePanel = ({ item, isOpen, onClose }) => {
   if (!item) return null;
 
+  const isPositive = item.score > 0;
+
   const points = [
-    { label: 'The Fact', value: item.title, icon: Info },
-    { label: 'The Impact', value: 'High likelihood of sector-wide volatility and strategic realignment.', icon: Target },
-    { label: 'The Sentiment', value: item.score > 0 ? 'Bullish / Positive expansion detected.' : 'Bearish / Risk mitigation required.', icon: Radio },
-    { label: 'The Velocity', value: `Currently at ${item.velocity} - Trending above 90th percentile.`, icon: BarChart3 },
-    { label: 'The "So What?"', value: 'Requires immediate executive review for resource allocation and risk management.', icon: HelpCircle },
+    { 
+      label: 'The Fact', 
+      value: item.title, 
+      icon: Crosshair,
+      accent: 'text-white/60'
+    },
+    { 
+      label: 'The Impact', 
+      value: isPositive 
+        ? 'Sector expansion signal detected. Position for upside capture.' 
+        : 'Contraction risk flagged. Hedge exposure and monitor downstream effects.',
+      icon: Target,
+      accent: 'text-white/60'
+    },
+    { 
+      label: 'The Sentiment', 
+      value: isPositive 
+        ? `Bullish. NLP Score: +${item.score}. Market confidence trending positive.` 
+        : `Bearish. NLP Score: ${item.score}. Defensive posture recommended.`,
+      icon: Radio,
+      accent: isPositive ? 'text-emeraldGlow' : 'text-roseGlow'
+    },
+    { 
+      label: 'The Velocity', 
+      value: `V-Index: ${item.velocity} — ${parseFloat(item.velocity) > 80 ? 'Critical mass. Viral propagation imminent.' : parseFloat(item.velocity) > 50 ? 'Elevated. Monitor for acceleration.' : 'Baseline. No immediate action required.'}`,
+      icon: BarChart3,
+      accent: 'text-white/60'
+    },
+    { 
+      label: 'So What?', 
+      value: isPositive 
+        ? 'Actionable window open. Executive decision required within 4h cycle.' 
+        : 'Risk containment priority. Escalate to stakeholders. Brief at next sync.',
+      icon: AlertTriangle,
+      accent: 'text-amber-400'
+    },
   ];
 
   return (
@@ -22,43 +55,60 @@ const SidePanel = ({ item, isOpen, onClose }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40"
           />
           <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 h-full w-full max-w-md bg-[#050505] border-l border-white/10 z-50 p-10 flex flex-col shadow-2xl"
+            transition={{ type: 'spring', damping: 30, stiffness: 250 }}
+            className="fixed top-0 right-0 h-full w-full max-w-md bg-[#030303] border-l border-white/[0.08] z-50 flex flex-col shadow-2xl"
           >
-            <div className="flex items-center justify-between mb-12">
-              <span className="text-[10px] font-bold tracking-[0.3em] text-white/30 uppercase">Executive Briefing</span>
-              <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-full transition-colors">
-                <X size={20} className="text-white/40" />
-              </button>
+            <div className="p-8 pb-0">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-3">
+                  <div className={`w-2 h-2 rounded-full ${isPositive ? 'bg-emeraldGlow' : 'bg-roseGlow'} animate-pulse`} />
+                  <span className="text-[10px] font-bold tracking-[0.3em] text-white/30 uppercase">Intelligence Brief</span>
+                </div>
+                <button onClick={onClose} className="p-2 hover:bg-white/5 rounded transition-colors">
+                  <X size={16} className="text-white/30" />
+                </button>
+              </div>
+              <div className="h-px bg-gradient-to-r from-white/10 to-transparent mb-8" />
             </div>
 
-            <h2 className={`text-2xl font-light mb-12 leading-tight ${item.class}`}>
-              {item.title}
-            </h2>
+            <div className="px-8 mb-6">
+              <h2 className={`text-xl font-light leading-tight ${item.class}`}>
+                {item.title}
+              </h2>
+            </div>
 
-            <div className="space-y-10 overflow-y-auto custom-scrollbar pr-4">
+            <div className="flex-grow overflow-y-auto custom-scrollbar px-8 space-y-8">
               {points.map((point, i) => (
-                <div key={i} className="group">
-                  <div className="flex items-center space-x-3 mb-2 text-white/40">
-                    <point.icon size={14} className="group-hover:text-emeraldGlow transition-colors" />
-                    <span className="text-[10px] font-bold tracking-widest uppercase">{point.label}</span>
+                <motion.div 
+                  key={i} 
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 + i * 0.08 }}
+                  className="group"
+                >
+                  <div className="flex items-center space-x-3 mb-2">
+                    <point.icon size={13} className={`${point.accent} transition-colors`} />
+                    <span className="text-[9px] font-bold tracking-[0.25em] text-white/30 uppercase">{point.label}</span>
                   </div>
-                  <p className="text-white/80 font-light leading-relaxed">
+                  <p className="text-white/70 text-sm font-light leading-relaxed pl-[25px]">
                     {point.value}
                   </p>
-                </div>
+                </motion.div>
               ))}
             </div>
 
-            <div className="mt-auto pt-10 border-t border-white/5">
-              <button className="w-full bg-white text-black py-4 text-xs font-bold tracking-[0.2em] uppercase hover:bg-emeraldGlow transition-colors">
+            <div className="p-8 pt-6 border-t border-white/[0.06] space-y-3">
+              <button className="w-full bg-white text-[#010101] py-3.5 text-[10px] font-bold tracking-[0.25em] uppercase hover:bg-emeraldGlow transition-colors">
                 Initiate Executive Action
+              </button>
+              <button onClick={onClose} className="w-full bg-transparent text-white/30 py-2 text-[10px] font-bold tracking-[0.2em] uppercase hover:text-white/60 transition-colors">
+                Dismiss Brief
               </button>
             </div>
           </motion.div>

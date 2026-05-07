@@ -14,9 +14,14 @@ function App() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [showHandover, setShowHandover] = useState(false);
+  const [systemTime, setSystemTime] = useState(new Date());
 
   useEffect(() => {
-    // Show handover if it's been more than 5 minutes or if first visit in this session
+    const timer = setInterval(() => setSystemTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
     if (lastVisit && !sessionStorage.getItem('handover_shown')) {
       setShowHandover(true);
       sessionStorage.setItem('handover_shown', 'true');
@@ -31,34 +36,41 @@ function App() {
   if (loading) {
     return (
       <div className="h-screen w-screen bg-[#010101] flex flex-col items-center justify-center">
-        <div className="w-12 h-12 border-2 border-white/10 border-t-emeraldGlow rounded-full animate-spin mb-4" />
-        <span className="text-[10px] font-bold tracking-[0.4em] text-white/30 uppercase">Initializing Vantage Intelligence...</span>
+        <div className="w-10 h-10 border border-white/10 border-t-emeraldGlow rounded-full animate-spin mb-6" />
+        <span className="text-[10px] font-bold tracking-[0.4em] text-white/20 uppercase">Acquiring Intelligence Stream...</span>
       </div>
     );
   }
 
   return (
-    <div className={`min-h-screen bg-obsidian text-white flex flex-col transition-all duration-500 ${!isVisible ? 'blur-grayscale' : ''}`}>
+    <div 
+      className={`min-h-screen bg-obsidian text-white flex flex-col transition-all duration-500 ${!isVisible ? 'blur-grayscale' : ''}`}
+      data-testid="vantage-root"
+    >
       <GlobalRibbon indices={marketIndices} onSelect={handleSelect} />
       <VelocityTicker news={news} />
       
       <main className="flex-grow">
-        <Dashboard news={news} onSelect={handleSelect} />
+        <Dashboard news={news} onSelect={handleSelect} city={city} />
       </main>
 
-      <footer className="p-4 border-t border-white/5 flex justify-between items-center bg-[#050505]">
-        <div className="flex items-center space-x-6">
+      <footer className="px-6 py-3 border-t border-white/[0.04] flex justify-between items-center bg-[#020202]">
+        <div className="flex items-center space-x-8">
           <div className="flex flex-col">
-            <span className="text-[8px] font-bold text-white/30 uppercase">Detected Location</span>
-            <span className="text-[10px] font-medium text-emeraldGlow">{city}</span>
+            <span className="text-[8px] font-bold text-white/20 uppercase tracking-[0.2em]">Station</span>
+            <span className="text-[11px] font-medium text-emeraldGlow">{city}</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-[8px] font-bold text-white/30 uppercase">System Time</span>
-            <span className="text-[10px] font-medium">{new Date().toLocaleTimeString()}</span>
+            <span className="text-[8px] font-bold text-white/20 uppercase tracking-[0.2em]">Clock</span>
+            <span className="text-[11px] font-mono text-white/50">{systemTime.toLocaleTimeString()}</span>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-[8px] font-bold text-white/20 uppercase tracking-[0.2em]">Signals</span>
+            <span className="text-[11px] font-mono text-white/50">{news.length}</span>
           </div>
         </div>
-        <div className="text-[8px] font-bold text-white/20 uppercase tracking-[0.2em]">
-          Vantage Executive v1.0.0 // Encrypted Stream
+        <div className="text-[8px] font-bold text-white/10 uppercase tracking-[0.2em]">
+          Vantage v1.0 // Encrypted
         </div>
       </footer>
 
